@@ -1,0 +1,20 @@
+{
+    "name": "lecon/mvcoop",
+    "autoload": {
+        "psr-4": {
+            "Lecon\\Mvcoop\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Minh1005",
+            "email": "minhlcph40002@fpt.edu.vn"
+        }
+    ],
+    "require": {
+        
+        "bramus/router": "~1.6",
+        "eftec/bladeone": "^4.9",
+        "symfony/dotenv": "6.4.x-dev"
+    }
+}
