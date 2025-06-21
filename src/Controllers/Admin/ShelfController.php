@@ -9,7 +9,7 @@ use Lecon\Mvcoop\Models\Category;
 use Lecon\Mvcoop\Models\Shelf;
 use Lecon\Mvcoop\Models\User;
 
-class BookController extends Controller {
+class ShelfController extends Controller {
     private $bookModel;
     private $categoryModel;
     private $userModel;

@@ -123,18 +123,19 @@ class User extends Model
         try {
             $sql = "SELECT * FROM users WHERE email = :email AND password = :password";
             $stmt = $this->conn->prepare($sql);
-    
-            $md5Password = md5($password);
-    
+            $md5Password = md5($password); // Đảm bảo mật khẩu được mã hóa MD5
             $stmt->bindParam(':email', $email);
             $stmt->bindParam(':password', $md5Password);
-    
             $stmt->execute();
-    
-            return $stmt->fetch();
+            $result = $stmt->fetch();
+            // Debug
+            if (!$result) {
+                error_log("No user found for email: $email, password: $md5Password");
+            }
+            return $result;
         } catch (\Exception $e) {
-            echo 'ERROR: ' . $e->getMessage();
-            die;
+            error_log("Error in getByEmailAndPassword: " . $e->getMessage());
+            die('ERROR: ' . $e->getMessage());
         }
     }
 
@@ -150,5 +151,46 @@ class User extends Model
         $stmt->bindParam(':full_name', $full_name);
         $stmt->bindParam(':role', $role);
         $stmt->execute();
+    }
+    public function getByUsername($username)
+    {
+        try {
+            $sql = "SELECT * FROM users WHERE username = :username";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+            return $stmt->fetch();
+        } catch (\Exception $e) {
+            echo 'ERROR: ' . $e->getMessage();
+            die;
+        }
+    }
+
+    public function getByStudentId($student_id)
+    {
+        try {
+            $sql = "SELECT * FROM users WHERE student_id = :student_id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':student_id', $student_id);
+            $stmt->execute();
+            return $stmt->fetch();
+        } catch (\Exception $e) {
+            echo 'ERROR: ' . $e->getMessage();
+            die;
+        }
+    }
+
+    public function getByEmail($email)
+    {
+        try {
+            $sql = "SELECT * FROM users WHERE email = :email";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+            return $stmt->fetch();
+        } catch (\Exception $e) {
+            echo 'ERROR: ' . $e->getMessage();
+            die;
+        }
     }
 }

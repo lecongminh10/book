@@ -16,22 +16,21 @@ use Lecon\Mvcoop\Controllers\Admin\BookController;
 
 // Create Router instance
 $router = new Router();
-
-// Define routes
-// ...
-
-
-// Tạo một tuyến đường (route) trong Laravel
+// client routes
 $router->get("/", HomeController::class . '@index');
-
-
-$router-> match('GET|POST' , '/auth/login' , AuthenticateController::class . '@login');
-
+$router->match('GET|POST', '/login', HomeController::class . '@login');
+$router->match('GET|POST', '/register', HomeController::class . '@register');
+$router->get('/logout', HomeController::class . '@logout');
 // Book borrowing routes
 $router->match('GET|POST', '/borrow', BorrowController::class . '@borrowBook');
 $router->get('/my-borrowings', BorrowController::class . '@myBorrowings');
 $router->get('/borrow/cancel/{id}', BorrowController::class . '@cancelBorrowing');
 
+
+
+
+// admin routes
+$router-> match('GET|POST' , '/auth/login' , AuthenticateController::class . '@login');
 $router->mount("/admin", function () use ($router){
    
     $router -> get("/" , DashboardController ::class ."@index");

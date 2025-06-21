@@ -1,54 +1,61 @@
-    <!-- ======= Header ======= -->
-    <header id="header" class="header d-flex align-items-center fixed-top">
-        <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+<!-- ======= Header ======= -->
+<header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
-            <a href="/" class="logo d-flex align-items-center">
-                <!-- Uncomment the line below if you also wish to use an image logo -->
-                <!-- <img src="./assets/client/assets/img/logo.png" alt=""> -->
-                <h1>ZenBlog</h1>
-            </a>
+        <a href="/" class="logo d-flex align-items-center">
+            <!-- Uncomment the line below if you also wish to use an image logo -->
+            <!-- <img src="./assets/client/assets/img/logo.png" alt=""> -->
+            <h1>ZenBlog</h1>
+        </a>
 
-            @php
-                $categories= (new  \Lecon\Mvcoop\Models\Category) ->getForMenu();
-            @endphp
+        @php
+            $categories = (new \Lecon\Mvcoop\Models\Category)->getForMenu();
+        @endphp
 
-            <nav id="navbar" class="navbar">
-                <ul>
-                    <li><a href="/">Trang chủ </a></li>
-                    <li class="dropdown"><a href="category.html"><span>Categories</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
-                        <ul>
-      
-                            @foreach($categories as $category)
-                            <li><a href="/categorise/{{ $category['id']}}">{{$category['name']}}</a></li>
+        <nav id="navbar" class="navbar">
+            <ul>
+                <li><a href="/">Trang chủ</a></li>
+                <li class="dropdown"><a href="category.html"><span>Categories</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
+                    <ul>
+                        @foreach($categories as $category)
+                            <li><a href="/categorise/{{ $category['id']}}">{{ $category['name'] }}</a></li>
+                        @endforeach
+                    </ul>
+                </li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </nav><!-- .navbar -->
 
-                            @endforeach
-                        </ul>
-                    </li>
+        <div class="position-relative">
+            <a href="#" class="mx-2"><span class="bi-facebook"></span></a>
+            <a href="#" class="mx-2"><span class="bi-twitter"></span></a>
+            <a href="#" class="mx-2"><span class="bi-instagram"></span></a>
+            <a href="#" class="mx-2 js-search-open"><span class="bi-search"></span></a>
+            <i class="bi bi-list mobile-nav-toggle"></i>
 
-                    <li><a href="/about">About</a></li>
-                    <li><a href="/contact">Contact</a></li>
-                </ul>
-            </nav><!-- .navbar -->
-
-            <div class="position-relative">
-                <a href="#" class="mx-2"><span class="bi-facebook"></span></a>
-                <a href="#" class="mx-2"><span class="bi-twitter"></span></a>
-                <a href="#" class="mx-2"><span class="bi-instagram"></span></a>
-
-                <a href="#" class="mx-2 js-search-open"><span class="bi-search"></span></a>
-                <i class="bi bi-list mobile-nav-toggle"></i>
-
-                <!-- ======= Search Form ======= -->
-                <div class="search-form-wrap js-search-form-wrap">
-                    <form action="search-result.html" class="search-form">
-                        <span class="icon bi-search"></span>
-                        <input type="text" placeholder="Search" class="form-control">
-                        <button class="btn js-search-close"><span class="bi-x"></span></button>
-                    </form>
-                </div><!-- End Search Form -->
-
-            </div>
-
+            <!-- ======= Search Form ======= -->
+            <div class="search-form-wrap js-search-form-wrap">
+                <form action="search-result.html" class="search-form">
+                    <span class="icon bi-search"></span>
+                    <input type="text" placeholder="Search" class="form-control">
+                    <button class="btn js-search-close"><span class="bi-x"></span></button>
+                </form>
+            </div><!-- End Search Form -->
         </div>
 
-    </header><!-- End Header -->
+        <div class="position-relative">
+            @if(!isset($_SESSION['user']))
+                <a href="/login" class="mx-2">Đăng nhập</a>
+                <a href="/register" class="mx-2">Đăng ký</a>
+            @else
+                <a href="/logout" class="mx-2">Đăng xuất</a>
+                @if(isset($_SESSION['user']['full_name']))
+                    <span class="mx-2">Xin chào, {{ $_SESSION['user']['full_name'] }}</span>
+                @else
+                    <span class="mx-2">Xin chào, Người dùng</span>
+                @endif
+            @endif
+        </div>
+    </div>
+</header><!-- End Header -->
