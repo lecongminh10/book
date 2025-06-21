@@ -54,6 +54,11 @@ $router->mount("/admin", function () use ($router){
         $router->get('/', BookController::class . '@index');
         $router->match('GET|POST', '/create',       BookController::class . '@create');
     });
+    $router->mount('/shelves', function () use ($router) {
+        $router->get('/', BookController::class . '@index');
+        $router->match('GET|POST', '/create',       BookController::class . '@create');
+    });
+
 
     $router->mount('/users', function () use ($router) {
         $router->get('/',                           UserController::class . '@index');

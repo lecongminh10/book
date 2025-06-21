@@ -82,29 +82,29 @@
         @endif
         <table class="table custom-table table-hover align-middle bg-white">
             <thead>
-                <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Student ID</th>
-                    <th scope="col">Username</th>
-                    <th scope="col">Full Name</th>
+                <tr>    
+                    <th scope="col">STTt</th>
+                    <th scope="col">Tên đăng nhập</th>
+                    <th scope="col">Tên đầy đủ</th>
                     <th scope="col">Email</th>
-                    <th scope="col">Role</th>
-                    <th scope="col" class="text-center">Action</th>
+                    <th scope="col">Quyền</th>
+                    <th scope="col" class="text-center">Hành động</th>
                 </tr>
             </thead>
             <tbody>
             @foreach ($users as $user)
                 <tr>
                     <td>{{ $user['id'] }}</td>
-                    <td>{{ $user['student_id'] }}</td>
                     <td>{{ $user['username'] }}</td>
                     <td>{{ $user['full_name'] }}</td>
                     <td>{{ $user['email'] }}</td>
                     <td>
                         @if(strtolower($user['role']) === 'admin')
-                            <span class="badge badge-role-admin">ADMIN</span>
+                            <span class="badge badge-role-admin">Quản trị</span>
+                        @elseif(strtolower($user['role']) === 'client')
+                            <span class="badge badge-role-client">Người dùng</span>
                         @else
-                            <span class="badge badge-role-client">CLIENT</span>
+                            <span class="badge badge-role-client">Tác giả</span>
                         @endif
                     </td>
                     <td class="text-center">
