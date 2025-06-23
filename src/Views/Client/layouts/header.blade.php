@@ -1,11 +1,9 @@
 <!-- ======= Header ======= -->
 <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
-
         <a href="/" class="logo d-flex align-items-center">
-            <!-- Uncomment the line below if you also wish to use an image logo -->
-            <!-- <img src="./assets/client/assets/img/logo.png" alt=""> -->
-            <h1>ZenBlog</h1>
+            <img src="{{ $logo ?? '/assets/client/assets/img/logo.png' }}" alt="Logo" style="max-height: 50px;">
+            <h1>{{ $title_logo ?? 'ZenBlog' }}</h1>
         </a>
 
         @php
@@ -18,7 +16,7 @@
                 <li class="dropdown"><a href="category.html"><span>Categories</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
                     <ul>
                         @foreach($categories as $category)
-                            <li><a href="/categorise/{{ $category['id']}}">{{ $category['name'] }}</a></li>
+                            <li><a href="/categorise/{{ $category['id'] }}">{{ $category['name'] }}</a></li>
                         @endforeach
                     </ul>
                 </li>

@@ -6,12 +6,13 @@ use Lecon\Mvcoop\Commons\Controller;
 use Lecon\Mvcoop\Models\User;
 
 use Lecon\Mvcoop\Models\Category;
+use Lecon\Mvcoop\Models\WebSetting;
 use Lecon\Mvcoop\Models\Post;
+
 
 
 class HomeController extends Controller
 {
-
     private User $user;
     private Category $category;
     public function __construct()
@@ -21,7 +22,12 @@ class HomeController extends Controller
     }
     public function index()
     {
-
+        $webSetting = new WebSetting();
+        $logo = $webSetting->getByName('logo')['value'] ?? '/assets/client/assets/img/logo.png';
+        $slide_1 = $webSetting->getByName('slide_1')['value'] ?? '/assets/client/assets/img/slide1.jpg';
+        $footer = $webSetting->getByName('footer')['value'] ?? '© 2025 ZenBlog. All rights reserved.';
+        $hotline = $webSetting->getByName('hotline')['value'] ?? '0901234567';
+        $title_logo =  $webSetting->getByName('title_logo')['value'] ?? 'ZEN BLOG';
         // Lấy danh sách tất cả các category
         $categories = $this->category->getAll();
 
@@ -49,7 +55,12 @@ class HomeController extends Controller
                 'postsByCategory' => $postsByCategory,
                 'postsByCategory2' => $postsByCategory2,
                 'poststitileTradding' => $poststitileTradding,
-                'postFirstLatestTitle' => $postFirstLatestTitle
+                'postFirstLatestTitle' => $postFirstLatestTitle,
+                'logo' => $logo,
+                'slide_1' => $slide_1,
+                'footer' => $footer,
+                'hotline' => $hotline,
+                'title_logo' => $title_logo
             ]
         );
     }

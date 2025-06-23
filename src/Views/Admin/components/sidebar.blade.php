@@ -46,6 +46,11 @@
             <span>Quản lí sách</span></a>
     </li>
     <li class="nav-item">
+        <a class="nav-link" href="/admin/settings">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Quản lí giao diện web</span></a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link" href="/admin/logout">
             <i class="fas fa-fw fa-chart-area"></i>
             <span>Đăng xuất </span></a>
