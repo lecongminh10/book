@@ -11,6 +11,8 @@ use Lecon\Mvcoop\Controllers\Admin\BorrowingController;
 use Lecon\Mvcoop\Controllers\Client\HomeController;
 use Lecon\Mvcoop\Controllers\Client\PostController as ClientPostController;
 use Lecon\Mvcoop\Controllers\Client\BorrowController;
+use Lecon\Mvcoop\Controllers\Client\ProfileController;
+use Lecon\Mvcoop\Controllers\Client\WebSettingController;
 use Lecon\Mvcoop\Controllers\Admin\BookController;
 use Lecon\Mvcoop\Controllers\Admin\CategoryPostController;
 use Lecon\Mvcoop\Controllers\Admin\PostController;
@@ -19,24 +21,32 @@ use Lecon\Mvcoop\Controllers\Admin\SettingController;
 
 // Create Router instance
 $router = new Router();
-// client routes
-$router->get("/", HomeController::class . '@index');
+
+// Client routes
+$router->get('/', WebSettingController::class . '@index');
 $router->match('GET|POST', '/login', HomeController::class . '@login');
 $router->match('GET|POST', '/register', HomeController::class . '@register');
 $router->get('/logout', HomeController::class . '@logout');
+
+// Profile routes - require authentication
+$router->get('/profile', ProfileController::class . '@index');
+$router->post('/profile/update', ProfileController::class . '@update');
+$router->post('/profile/change-password', ProfileController::class . '@changePassword');
+
 // Book borrowing routes
 $router->match('GET|POST', '/borrow', BorrowController::class . '@borrowBook');
 $router->get('/my-borrowings', BorrowController::class . '@myBorrowings');
 $router->get('/borrow/cancel/{id}', BorrowController::class . '@cancelBorrowing');
-// 
-$router->get('/', 'Lecon\Mvcoop\Controllers\Client\WebSettingController@index');
 
-// admin routes
+// Admin authentication route
 $router->match('GET|POST', '/auth/login', AuthenticateController::class . '@login');
+
+// Admin routes
 $router->mount("/admin", function () use ($router) {
     $router->get("/", DashboardController::class . '@index');
     $router->get('/logout', AuthenticateController::class . '@logout');
-    // web setting routes
+    
+    // Web setting routes
     $router->mount('/settings', function () use ($router) {
         $router->get('/', SettingController::class . '@index');
         $router->get('/create', SettingController::class . '@create');
@@ -44,6 +54,7 @@ $router->mount("/admin", function () use ($router) {
         $router->get('/update/{id}', SettingController::class . '@update');
         $router->post('/update/{id}', SettingController::class . '@update');
     });
+    
     // Book borrowing management routes
     $router->mount('/borrowings', function () use ($router) {
         $router->get('/', BorrowingController::class . '@index');
@@ -58,21 +69,25 @@ $router->mount("/admin", function () use ($router) {
         $router->get('/return/{id}', BorrowingController::class . '@return');
     });
 
+    // Book management routes
     $router->mount('/books', function () use ($router) {
         $router->get('/', BookController::class . '@index');
-        $router->match('GET|POST', '/create',       BookController::class . '@create');
-        $router->match('GET|POST', '/{id}/update',  BookController::class . '@update');
-        $router->get('/{id}/show',                  BookController::class . '@show');
-        $router->get('/{id}/delete',                BookController::class . '@delete');
+        $router->match('GET|POST', '/create', BookController::class . '@create');
+        $router->match('GET|POST', '/{id}/update', BookController::class . '@update');
+        $router->get('/{id}/show', BookController::class . '@show');
+        $router->get('/{id}/delete', BookController::class . '@delete');
     });
+    
+    // Shelf management routes
     $router->mount('/shelves', function () use ($router) {
         $router->get('/', ShelfController::class . '@index');
-        $router->match('GET|POST', '/create',       ShelfController::class . '@create');
-        $router->get('/{id}/delete',                ShelfController::class . '@delete');
-        $router->match('GET|POST', '/{id}/update',  ShelfController::class . '@update');
+        $router->match('GET|POST', '/create', ShelfController::class . '@create');
+        $router->get('/{id}/delete', ShelfController::class . '@delete');
+        $router->match('GET|POST', '/{id}/update', ShelfController::class . '@update');
         $router->get('(\d+)/positions', ShelfController::class . '@getPositionsJson');
     });
 
+    // User management routes
     $router->mount('/users', function () use ($router) {
         $router->get('/', UserController::class . '@index');
         $router->get('/{id}/show', UserController::class . '@show');
@@ -80,6 +95,8 @@ $router->mount("/admin", function () use ($router) {
         $router->match('GET|POST', '/{id}/update', UserController::class . '@update');
         $router->match('GET|POST', '/create', UserController::class . '@create');
     });
+    
+    // Category management routes
     $router->mount('/categorys', function () use ($router) {
         $router->get('/', CategoryController::class . '@index');
         $router->get('/{id}/show', CategoryController::class . '@show');
@@ -88,6 +105,7 @@ $router->mount("/admin", function () use ($router) {
         $router->match('GET|POST', '/create', CategoryController::class . '@create');
     });
 
+    // Category post management routes
     $router->mount('/category-post', function () use ($router) {
         $router->get('/', CategoryPostController::class . '@index');
         $router->get('/{id}/show', CategoryPostController::class . '@show');
@@ -95,6 +113,8 @@ $router->mount("/admin", function () use ($router) {
         $router->match('GET|POST', '/{id}/update', CategoryPostController::class . '@update');
         $router->match('GET|POST', '/create', CategoryPostController::class . '@create');
     });
+    
+    // Post management routes
     $router->mount('/posts', function () use ($router) {
         $router->get('/', PostController::class . '@index');
         $router->get('/{id}/show', PostController::class . '@show');
@@ -104,6 +124,7 @@ $router->mount("/admin", function () use ($router) {
     });
 });
 
+// Middleware for admin routes - require admin authentication
 $router->before('GET|POST', '/admin/*', function() {
     if (
         !isset($_SESSION['user']) ||
@@ -115,14 +136,28 @@ $router->before('GET|POST', '/admin/*', function() {
     }
 });
 
-// Giải thích từng phần:
-// - $router: Đối tượng định tuyến trong Laravel, sử dụng để định rõ các tuyến của ứng dụng.
-// - get("/"): Tạo một tuyến với phương thức HTTP là GET và đường dẫn là "/" (đường dẫn gốc).
+// Middleware for profile routes - require user authentication
+$router->before('GET|POST', '/profile*', function() {
+    if (!isset($_SESSION['user'])) {
+        header('Location: /login');
+        exit();
+    }
+});
 
-// Xác định controller và phương thức để xử lý khi tuyến được truy cập.
-// - HomeController::class: Tên của controller được sử dụng.
-// - '@index': Phương thức trong controller (trong trường hợp này, là phương thức "index").
-//   Controller và phương thức này sẽ được gọi khi tuyến được truy cập.
+// Middleware for borrowing routes - require user authentication
+$router->before('GET|POST', '/borrow*', function() {
+    if (!isset($_SESSION['user'])) {
+        header('Location: /login');
+        exit();
+    }
+});
 
-// Run it!
+$router->before('GET|POST', '/my-borrowings', function() {
+    if (!isset($_SESSION['user'])) {
+        header('Location: /login');
+        exit();
+    }
+});
+
+// Run the router
 $router->run();

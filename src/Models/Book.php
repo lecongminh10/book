@@ -156,4 +156,50 @@ class Book extends Model {
         $result = $stmt->fetch();
         return $result ? (int)$result['total'] : 0;
     }
+public function getBooksByCategoryAll()
+    {
+        $sql = "
+            SELECT c.name AS category_name, COUNT(b.id) AS book_count
+            FROM books b
+            LEFT JOIN categories c ON b.category_id = c.id
+            GROUP BY c.id, c.name
+            ORDER BY book_count DESC
+        ";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+    }
+
+    public function getBooksByRating()
+    {
+        $sql = "
+            SELECT b.title, AVG(br.rating) AS avg_rating, COUNT(br.id) AS rating_count
+            FROM books b
+            LEFT JOIN book_ratings br ON b.id = br.book_id
+            GROUP BY b.id, b.title
+            HAVING avg_rating IS NOT NULL
+            ORDER BY avg_rating DESC
+            LIMIT 10
+        ";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+    }
+
+    public function getBooksByShelf()
+    {
+        $sql = "
+            SELECT b.shelf_position_id, COUNT(b.id) AS book_count
+            FROM books b
+            WHERE b.shelf_position_id IS NOT NULL
+            GROUP BY b.shelf_position_id
+            ORDER BY b.shelf_position_id
+        ";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+    }
 } 

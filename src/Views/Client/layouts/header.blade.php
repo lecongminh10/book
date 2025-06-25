@@ -13,7 +13,8 @@
         <nav id="navbar" class="navbar">
             <ul>
                 <li><a href="/">Trang chủ</a></li>
-                <li class="dropdown"><a href="category.html"><span>Categories</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
+                <li class="dropdown"><a href="category.html"><span>Categories</span> <i
+                            class="bi bi-chevron-down dropdown-indicator"></i></a>
                     <ul>
                         @foreach($categories as $category)
                             <li><a href="/categorise/{{ $category['id'] }}">{{ $category['name'] }}</a></li>
@@ -47,12 +48,24 @@
                 <a href="/login" class="mx-2">Đăng nhập</a>
                 <a href="/register" class="mx-2">Đăng ký</a>
             @else
-                <a href="/logout" class="mx-2">Đăng xuất</a>
-                @if(isset($_SESSION['user']['full_name']))
-                    <span class="mx-2">Xin chào, {{ $_SESSION['user']['full_name'] }}</span>
-                @else
-                    <span class="mx-2">Xin chào, Người dùng</span>
-                @endif
+                <!-- User dropdown menu -->
+                <div class="dropdown d-inline">
+                    <a class="dropdown-toggle mx-2" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        @if(isset($_SESSION['user']['full_name']))
+                            <i class="fas fa-user"></i> {{ $_SESSION['user']['full_name'] }}
+                        @else
+                            <i class="fas fa-user"></i> Người dùng
+                        @endif
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="/profile"><i class="fas fa-user-cog"></i> Hồ sơ cá nhân</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+                    </ul>
+                </div>
             @endif
         </div>
     </div>
