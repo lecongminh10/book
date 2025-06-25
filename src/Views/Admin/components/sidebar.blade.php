@@ -56,6 +56,16 @@
             <span>Quản lí giao diện web</span></a>
     </li>
     <li class="nav-item">
+        <a class="nav-link" href="/admin/category-post">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Quản lí danh mục bài viết</span></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/admin/posts">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Quản lí bài viết</span></a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link" href="/admin/logout">
             <i class="fas fa-fw fa-chart-area"></i>
             <span>Đăng xuất </span></a>

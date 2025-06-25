@@ -2,7 +2,7 @@
 
 namespace Lecon\Mvcoop\Controllers\Client;
 use Lecon\Mvcoop\Commons\Controller;
-
+use Lecon\Mvcoop\Models\Book;
 use Lecon\Mvcoop\Models\User;
 
 use Lecon\Mvcoop\Models\Category;
@@ -15,10 +15,12 @@ class HomeController extends Controller
 {
     private User $user;
     private Category $category;
+    private $book;
     public function __construct()
     {
         $this->category = new Category;
         $this->user = new User();
+        $this->book = new Book();
     }
     public function index()
     {
@@ -45,6 +47,7 @@ class HomeController extends Controller
 
         }
 
+        $books = $this->book->getBooksPaginated(12, 0);
 
 
         // Trả về view với dữ liệu được truyền đi
@@ -60,7 +63,8 @@ class HomeController extends Controller
                 'slide_1' => $slide_1,
                 'footer' => $footer,
                 'hotline' => $hotline,
-                'title_logo' => $title_logo
+                'title_logo' => $title_logo,
+                'books'=>$books
             ]
         );
     }

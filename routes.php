@@ -12,6 +12,8 @@ use Lecon\Mvcoop\Controllers\Client\HomeController;
 use Lecon\Mvcoop\Controllers\Client\PostController as ClientPostController;
 use Lecon\Mvcoop\Controllers\Client\BorrowController;
 use Lecon\Mvcoop\Controllers\Admin\BookController;
+use Lecon\Mvcoop\Controllers\Admin\CategoryPostController;
+use Lecon\Mvcoop\Controllers\Admin\PostController;
 use Lecon\Mvcoop\Controllers\Admin\ShelfController;
 use Lecon\Mvcoop\Controllers\Admin\SettingController;
 
@@ -84,6 +86,21 @@ $router->mount("/admin", function () use ($router) {
         $router->get('/{id}/delete', CategoryController::class . '@delete');
         $router->match('GET|POST', '/{id}/update', CategoryController::class . '@update');
         $router->match('GET|POST', '/create', CategoryController::class . '@create');
+    });
+
+    $router->mount('/category-post', function () use ($router) {
+        $router->get('/', CategoryPostController::class . '@index');
+        $router->get('/{id}/show', CategoryPostController::class . '@show');
+        $router->get('/{id}/delete', CategoryPostController::class . '@delete');
+        $router->match('GET|POST', '/{id}/update', CategoryPostController::class . '@update');
+        $router->match('GET|POST', '/create', CategoryPostController::class . '@create');
+    });
+    $router->mount('/posts', function () use ($router) {
+        $router->get('/', PostController::class . '@index');
+        $router->get('/{id}/show', PostController::class . '@show');
+        $router->get('/{id}/delete', PostController::class . '@delete');
+        $router->match('GET|POST', '/{id}/update', PostController::class . '@update');
+        $router->match('GET|POST', '/create', PostController::class . '@create');
     });
 });
 
