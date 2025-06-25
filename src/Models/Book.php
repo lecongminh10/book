@@ -131,17 +131,23 @@ class Book extends Model {
     }
 
     public function getBooksPaginated($limit, $offset) {
-        $sql = "SELECT b.*, c.name as category_name 
+        $sql = "SELECT 
+                    b.*, 
+                    c.name AS category_name,
+                    AVG(b_r.rating) AS average_rating
                 FROM books b 
                 LEFT JOIN categories c ON b.category_id = c.id 
+                LEFT JOIN book_ratings b_r ON b_r.book_id = b.id
+                GROUP BY b.id
                 ORDER BY b.created_at DESC 
                 LIMIT :limit OFFSET :offset";
+    
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':limit', (int)$limit, \PDO::PARAM_INT);
         $stmt->bindValue(':offset', (int)$offset, \PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
-    }
+    }    
 
     public function countBooks() {
         $sql = "SELECT COUNT(*) as total FROM books";
