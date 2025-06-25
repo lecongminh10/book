@@ -2,7 +2,7 @@
 <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
         <a href="/" class="logo d-flex align-items-center">
-            <img src="{{ $logo ?? '/assets/client/assets/img/logo.png' }}" alt="Logo" style="max-height: 50px;">
+            <img src="/{{ $logo ?? 'assets/client/assets/img/logo.png' }}" alt="Logo" style="max-height: 50px;">
             <h1>{{ $title_logo ?? 'ZenBlog' }}</h1>
         </a>
 
@@ -13,16 +13,15 @@
         <nav id="navbar" class="navbar">
             <ul>
                 <li><a href="/">Trang chủ</a></li>
-                <li class="dropdown"><a href="category.html"><span>Categories</span> <i
-                            class="bi bi-chevron-down dropdown-indicator"></i></a>
+                <li class="dropdown"><a href="#"><span>Danh mục</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
                     <ul>
                         @foreach($categories as $category)
                             <li><a href="/categorise/{{ $category['id'] }}">{{ $category['name'] }}</a></li>
                         @endforeach
                     </ul>
                 </li>
-                <li><a href="/about">About</a></li>
-                <li><a href="/contact">Contact</a></li>
+                <li><a href="/about">Về chúng tôi</a></li>
+                <li><a href="/contact">Liên hệ</a></li>
             </ul>
         </nav><!-- .navbar -->
 

@@ -147,8 +147,38 @@ class Book extends Model {
         $stmt->bindValue(':offset', (int)$offset, \PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
+    }
+    public function new_getBoosk() {
+        $sql = "SELECT 
+                    b.*, 
+                    c.name AS category_name,
+                    AVG(b_r.rating) AS average_rating
+                FROM books b 
+                LEFT JOIN categories c ON b.category_id = c.id 
+                LEFT JOIN book_ratings b_r ON b_r.book_id = b.id
+                GROUP BY b.id
+                ORDER BY b.created_at DESC 
+                LIMIT 6";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
     }    
-
+    public function hot_getBoosk() {
+        $sql = "SELECT 
+                    b.*, 
+                    c.name AS category_name,
+                    AVG(b_r.rating) AS average_rating
+                FROM books b 
+                LEFT JOIN categories c ON b.category_id = c.id 
+                LEFT JOIN book_ratings b_r ON b_r.book_id = b.id
+                WHERE b.is_featured=1
+                GROUP BY b.id
+                ORDER BY b.created_at DESC 
+                LIMIT 6";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }   
     public function countBooks() {
         $sql = "SELECT COUNT(*) as total FROM books";
         $stmt = $this->conn->prepare($sql);
@@ -201,5 +231,31 @@ public function getBooksByCategoryAll()
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+    public function list_book_cat($id) {
+            if (!is_numeric($id) || $id <= 0) {
+                error_log("Invalid category ID: $id");
+                return [];
+            }
+
+            // Query books with average rating, grouped by book
+            $sql = "SELECT books.id, books.title, books.author, books.category_id, books.publish_year, 
+                           books.isbn, books.location_description, books.cover_front, books.cover_back, 
+                           books.summary, books.content, books.is_featured, books.shelf_position_id,
+                           COALESCE(AVG(b_r.rating), 0) AS average_rating
+                    FROM books 
+                    LEFT JOIN book_ratings b_r ON b_r.book_id = books.id
+                    WHERE books.category_id = ?
+                    GROUP BY books.id, books.title, books.author, books.category_id, books.publish_year, 
+                             books.isbn, books.location_description, books.cover_front, books.cover_back, 
+                             books.summary, books.content, books.is_featured, books.shelf_position_id
+                    ORDER BY books.title ASC";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$id]);
+            $books = $stmt->fetchAll();
+
+            // Log result count
+            error_log("Found " . count($books) . " books for category_id: $id");
+
+            return $books ?: [];
     }
 } 
