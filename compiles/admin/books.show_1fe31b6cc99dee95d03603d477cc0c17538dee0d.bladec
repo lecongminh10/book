@@ -1,0 +1,67 @@
+<?php $_shouldextend[1]=1; ?>
+
+<?php $this->startSection('title'); ?>
+ Chi tiết Sách
+<?php $this->stopSection(); ?>
+
+<?php $this->startSection('content'); ?>
+<style>
+ .imaeg{
+ position: relative;
+ }
+ .cover-image-ts{
+ position: absolute;
+ top: 5px;
+ left: 10px;
+ margin-left: 5px;
+ }
+</style>
+<div class="container py-5">
+ <div class="row justify-content-center">
+ <div class="col-lg-8 col-md-10">
+ <div class="card shadow border-0 rounded-4 overflow-hidden animate__animated animate__fadeIn">
+ <div class="row g-0">
+ <div class="col-md-4 bg-light d-flex flex-column align-items-center justify-content-center p-3 imaeg">
+ <div class="cover-image-ts">
+ <img src="/<?php echo \htmlentities($book['cover_front'] ?? 'assets/img/default-book.png'??'', ENT_QUOTES, 'UTF-8', false); ?>" alt="Bìa trước" class="img-fluid rounded shadow mb-3 border border-2" >
+ <?php if(!empty($book['cover_back'])): ?>
+ <img src="/<?php echo \htmlentities($book['cover_back']??'', ENT_QUOTES, 'UTF-8', false); ?>" alt="Bìa sau" class="img-fluid rounded border border-1">
+ <?php endif; ?>
+ </div>
+ </div>
+ <div class="col-md-8 p-4">
+ <h2 class="fw-bold mb-2 text-primary"><?php echo \htmlentities($book['title']??'', ENT_QUOTES, 'UTF-8', false); ?></h2>
+ <div class="mb-2">
+ <span class="badge bg-gradient-primary bg-primary bg-opacity-75 me-2"><?php echo \htmlentities($book['category_name']??'', ENT_QUOTES, 'UTF-8', false); ?></span>
+ <?php if($book['is_featured']): ?>
+ <span class="badge bg-success">Nổi bật</span>
+ <?php endif; ?>
+ </div>
+ <ul class="list-unstyled mb-3">
+ <li><strong>Tác giả:</strong> <?php echo \htmlentities($book['author']??'', ENT_QUOTES, 'UTF-8', false); ?></li>
+ <li><strong>Năm XB:</strong> <?php echo \htmlentities($book['publish_year']??'', ENT_QUOTES, 'UTF-8', false); ?></li>
+ <li><strong>ISBN:</strong> <?php echo \htmlentities($book['isbn']??'', ENT_QUOTES, 'UTF-8', false); ?></li>
+ <li><strong>Kệ sách:</strong> <?php echo \htmlentities($book['location_description']??'', ENT_QUOTES, 'UTF-8', false); ?></li>
+ <li><strong>Vị trí trong kệ:</strong> <?php echo \htmlentities($book['shelf_position_title'] ?? 'Không xác định'??'', ENT_QUOTES, 'UTF-8', false); ?></li>
+ </ul>
+ <div class="mb-3">
+ <h6 class="fw-bold mb-1">Tóm tắt</h6>
+ <div class="text-muted small"><?php echo \htmlentities($book['summary']??'', ENT_QUOTES, 'UTF-8', false); ?></div>
+ </div>
+ <div>
+ <h6 class="fw-bold mb-1">Nội dung</h6>
+ <div class="text-muted small"><?php echo $book['content']; ?></div>
+ </div>
+ <div class="mt-4 d-flex gap-2">
+ <a href="/admin/books" class="btn btn-outline-secondary rounded-pill px-4">Quay lại</a>
+ <a href="/admin/books/<?php echo \htmlentities($book['id']??'', ENT_QUOTES, 'UTF-8', false); ?>/update" class="btn btn-primary rounded-pill px-4">Chỉnh sửa</a>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+</div>
+<?php $this->stopSection(); ?>
+
+<?php if (isset($_shouldextend[1])) { echo $this->runChild('layouts.master'); } ?>

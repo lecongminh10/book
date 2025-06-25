@@ -87,7 +87,7 @@
  <!-- Page level custom scripts -->
  <script src="/assets/admin/js/demo/chart-area-demo.js"></script>
  <script src="/assets/admin/js/demo/chart-pie-demo.js"></script>
-
+ <?php echo $this->yieldContent('scripts'); ?>
 </body>
 
 </html>

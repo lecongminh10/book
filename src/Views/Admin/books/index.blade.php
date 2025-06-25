@@ -32,9 +32,9 @@ Danh sách Sách
                 </tr>
             </thead>
             <tbody>
-                @foreach ($books as $book)
+                @foreach ($books as $key=> $book)
                 <tr>
-                    <td>{{ $book['id'] }}</td>
+                    <td>{{ $key+1 }}</td>
                     <td>{{ $book['title'] }}</td>
                     <td>{{ $book['author'] }}</td>
                     <td>{{ $book['category_id'] }}</td>

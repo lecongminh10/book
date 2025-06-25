@@ -1,0 +1,289 @@
+@extends('layouts.master')
+
+@section('title')
+    Thêm mới Kệ
+@endsection
+
+@section('content')
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Thêm mới Kệ</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/shelves/create" method="POST" id="shelf-form">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Tên kệ</label>
+                            <input type="text" class="form-control" id="name" name="name" required maxlength="100">
+                            @error('name')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="location_note" class="form-label">Ghi chú vị trí</label>
+                            <textarea class="form-control" id="location_note" name="location_note" rows="2"></textarea>
+                            @error('location_note')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-auto">
+                                <label for="shelf-cols" class="form-label mb-0">Số box mỗi hàng:</label>
+                                <input type="number" id="shelf-cols" name="shelf-cols" class="form-control" value="5" min="1" max="20" style="width:80px;display:inline-block;">
+                            </div>
+                            <div class="col-auto">
+                                <label for="shelf-rows" class="form-label mb-0">Số hàng:</label>
+                                <input type="number" id="shelf-rows" name="shelf-rows" class="form-control" value="2" min="1" max="20" style="width:80px;display:inline-block;">
+                            </div>
+                        </div>
+                        <hr>
+                        <h5>Vị trí sách trong kệ</h5>
+                        <div class="form-container mb-3">
+                            <input type="text" id="positionTitle" placeholder="Nhập tên vị trí sách" class="form-control d-inline-block w-auto" style="width:200px;">
+                            <input type="color" id="positionColor" value="#FFD700" class="form-control d-inline-block w-auto" style="width:50px;">
+                            <button type="button" class="btn btn-secondary" id="add-position-btn">Thêm vị trí</button>
+                        </div>
+                        <div class="bookshelf">
+                            <div class="shelf" id="shelf-3d">
+                                <!-- Vị trí sách sẽ được thêm động bằng JS -->
+                            </div>
+                        </div>
+                        <div id="hidden-positions"></div>
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="submit" class="btn btn-success">Lưu kệ</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('styles')
+<style>
+.bookshelf {
+    perspective: 1000px;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 800px;
+    background: #8B4513;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    overflow-x: auto;
+}
+.shelf {
+    display: grid;
+    gap: 10px;
+    background: #fff8f5;
+    padding: 15px;
+    border-radius: 5px;
+    grid-template-columns: repeat(var(--shelf-cols, 5), 1fr);
+    grid-auto-rows: 1fr;
+    min-width: max-content;
+}
+.book {
+    width: 60px;
+    height: 180px;
+    background: #4e73df  !important;
+    position: relative;
+    transform: rotateY(-20deg);
+    transition: transform 0.3s ease;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #010101;
+    font-size: 12px;
+    text-align: center;
+    padding: 5px;
+    cursor: grab;
+}
+.book:hover {
+    transform: rotateY(0deg);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+.book:active {
+    cursor: grabbing;
+}
+.book-title {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+}
+.form-container input[type="text"] {
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.form-container input[type="color"] {
+    margin-right: 10px;
+}
+.form-container button {
+    padding: 8px 15px;
+    background: #A0522D;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.form-container button:hover {
+    background: #8B4513;
+}
+.delete-book-btn {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    border: 1px solid white;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s, transform 0.2s;
+}
+.delete-book-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+.sortable-ghost {
+    opacity: 0.4;
+    background: #A0522D;
+}
+</style>
+@endsection
+
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function lightenColor(color, percent) {
+    const num = parseInt(color.replace("#",""), 16),
+          amt = Math.round(2.55 * percent),
+          R = (num >> 16) + amt,
+          G = (num >> 8 & 0x00FF) + amt,
+          B = (num & 0x0000FF) + amt;
+    return "#" + (0x1000000 + 
+                 (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + 
+                 (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + 
+                 (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const addBtn = document.getElementById('add-position-btn');
+    const titleInput = document.getElementById('positionTitle');
+    const colorInput = document.getElementById('positionColor');
+    const shelf = document.getElementById('shelf-3d');
+    const hiddenPositions = document.getElementById('hidden-positions');
+    const form = document.getElementById('shelf-form');
+    const colsInput = document.getElementById('shelf-cols');
+    const rowsInput = document.getElementById('shelf-rows');
+
+    function updateShelfGrid() {
+        const cols = parseInt(colsInput.value) || 1;
+        shelf.style.setProperty('--shelf-cols', cols);
+        // Ẩn các box vượt quá số hàng*cột
+        const maxBox = cols * (parseInt(rowsInput.value) || 1);
+        shelf.querySelectorAll('.book').forEach((book, idx) => {
+            book.style.display = idx < maxBox ? '' : 'none';
+        });
+    }
+
+    colsInput.addEventListener('input', updateShelfGrid);
+    rowsInput.addEventListener('input', updateShelfGrid);
+
+    function updateHiddenInputs() {
+        hiddenPositions.innerHTML = '';
+        shelf.querySelectorAll('.book').forEach(book => {
+            if (book.style.display === 'none') return;
+            const title = book.getAttribute('data-title') || '';
+            const color = book.getAttribute('data-color') || '';
+            const hiddenTitle = document.createElement('input');
+            hiddenTitle.type = 'hidden';
+            hiddenTitle.name = 'positions[]';
+            hiddenTitle.value = title + '||' + color;
+            hiddenPositions.appendChild(hiddenTitle);
+        });
+    }
+
+    new Sortable(shelf, {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: function (evt) {
+            updateHiddenInputs();
+        },
+    });
+
+    function createBox(title, color) {
+        const book = document.createElement('div');
+        book.className = 'book';
+        book.setAttribute('data-title', title);
+        book.setAttribute('data-color', color);
+        book.style.background = `linear-gradient(45deg, ${color}, ${lightenColor(color, 20)})`;
+        book.innerHTML = `<span class="delete-book-btn">&times;</span><span class="book-title">${title}</span>`;
+        return book;
+    }
+
+    addBtn.addEventListener('click', function() {
+        const cols = parseInt(colsInput.value) || 1;
+        const rows = parseInt(rowsInput.value) || 1;
+        const maxBox = cols * rows;
+        if (shelf.querySelectorAll('.book').length >= maxBox) {
+            alert('Đã đạt số lượng vị trí tối đa cho kệ này!');
+            return;
+        }
+        const title = titleInput.value.trim();
+        const color = colorInput.value;
+        if (!title) {
+            alert('Vui lòng nhập tên vị trí sách!');
+            return;
+        }
+        const book = createBox(title, color);
+        shelf.appendChild(book);
+        titleInput.value = '';
+        updateShelfGrid();
+        updateHiddenInputs();
+    });
+
+    shelf.addEventListener('click', function(event) {
+        if (event.target.classList.contains('delete-book-btn')) {
+            event.target.closest('.book').remove();
+            updateHiddenInputs();
+        }
+    });
+
+    // Validate khi submit
+    form.addEventListener('submit', function(event) {
+        updateShelfGrid();
+        updateHiddenInputs();
+        const cols = parseInt(colsInput.value) || 1;
+        const rows = parseInt(rowsInput.value) || 1;
+        const maxBox = cols * rows;
+        const visibleBooks = Array.from(shelf.querySelectorAll('.book')).filter(b => b.style.display !== 'none');
+        if (visibleBooks.length === 0) {
+            event.preventDefault();
+            alert('Vui lòng thêm ít nhất một vị trí sách!');
+        }
+        if (visibleBooks.length > maxBox) {
+            event.preventDefault();
+            alert('Số vị trí vượt quá cấu hình kệ!');
+        }
+    });
+
+    // Khởi tạo grid ban đầu
+    updateShelfGrid();
+    updateHiddenInputs();
+});
+</script>
+@endsection

@@ -13,6 +13,7 @@ use Lecon\Mvcoop\Controllers\Client\HomeController;
 use Lecon\Mvcoop\Controllers\Client\PostController as ClientPostController;
 use Lecon\Mvcoop\Controllers\Client\BorrowController;
 use Lecon\Mvcoop\Controllers\Admin\BookController;
+use Lecon\Mvcoop\Controllers\Admin\ShelfController;
 
 // Create Router instance
 $router = new Router();
@@ -43,6 +44,8 @@ $router->mount("/admin", function () use ($router){
         $router->get('/pending', BorrowingController::class . '@pending');
         $router->get('/active', BorrowingController::class . '@active');
         $router->get('/overdue', BorrowingController::class . '@overdue');
+        $router->get('/returned', BorrowingController::class . '@returned');
+        $router->get('/rejected', BorrowingController::class . '@rejected');
         $router->get('/statistics', BorrowingController::class . '@statistics');
         $router->get('/approve/{id}', BorrowingController::class . '@approve');
         $router->get('/reject/{id}', BorrowingController::class . '@reject');
@@ -53,10 +56,16 @@ $router->mount("/admin", function () use ($router){
     $router->mount('/books', function () use ($router) {
         $router->get('/', BookController::class . '@index');
         $router->match('GET|POST', '/create',       BookController::class . '@create');
+        $router->match('GET|POST', '/{id}/update',  BookController::class . '@update');
+        $router->get('/{id}/show',                  BookController::class . '@show');
+        $router->get('/{id}/delete',                BookController::class . '@delete');
     });
     $router->mount('/shelves', function () use ($router) {
-        $router->get('/', BookController::class . '@index');
-        $router->match('GET|POST', '/create',       BookController::class . '@create');
+        $router->get('/', ShelfController::class . '@index');
+        $router->match('GET|POST', '/create',       ShelfController::class . '@create');
+        $router->get('/{id}/delete',                ShelfController::class . '@delete');
+        $router->match('GET|POST', '/{id}/update',  ShelfController::class . '@update');
+        $router->get('(\d+)/positions', ShelfController::class . '@getPositionsJson');
     });
 
 
@@ -79,7 +88,11 @@ $router->mount("/admin", function () use ($router){
 });
 
 $router->before('GET|POST', '/admin/*', function() {
-    if (!isset($_SESSION['user'])) {
+    if (
+        !isset($_SESSION['user']) ||
+        empty($_SESSION['user']['role']) ||
+        strtolower($_SESSION['user']['role']) !== 'admin'
+    ) {
         header('Location: /auth/login');
         exit();
     }

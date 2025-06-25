@@ -109,4 +109,61 @@ class BookBorrowing extends Model {
         $stmt->execute();
         return $stmt->fetch();
     }
+
+    public function getReturnedBorrowings() {
+        $sql = "SELECT bb.*, b.title, b.author, u.full_name, u.student_id 
+                FROM book_borrowings bb 
+                JOIN books b ON bb.book_id = b.id 
+                JOIN users u ON bb.user_id = u.id 
+                WHERE bb.status = 'returned' 
+                ORDER BY bb.return_date DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getRejectedBorrowings() {
+        $sql = "SELECT bb.*, b.title, b.author, u.full_name, u.student_id 
+                FROM book_borrowings bb 
+                JOIN books b ON bb.book_id = b.id 
+                JOIN users u ON bb.user_id = u.id 
+                WHERE bb.status = 'rejected' 
+                ORDER BY bb.created_at DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getBorrowingsPaginated($status = null, $limit = 10, $offset = 0) {
+        $where = '';
+        $params = [];
+        if ($status) {
+            $where = "WHERE bb.status = ?";
+            $params[] = $status;
+        }
+        $sql = "SELECT bb.*, b.title, b.author, u.full_name, u.student_id
+                FROM book_borrowings bb
+                JOIN books b ON bb.book_id = b.id
+                JOIN users u ON bb.user_id = u.id
+                $where
+                ORDER BY bb.created_at DESC
+                LIMIT $limit OFFSET $offset";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
+    public function countBorrowings($status = null) {
+        $where = '';
+        $params = [];
+        if ($status) {
+            $where = "WHERE status = ?";
+            $params[] = $status;
+        }
+        $sql = "SELECT COUNT(*) as total FROM book_borrowings $where";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute($params);
+        $result = $stmt->fetch();
+        return $result ? (int)$result['total'] : 0;
+    }
 } 

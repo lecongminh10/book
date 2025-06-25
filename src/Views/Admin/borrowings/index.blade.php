@@ -51,16 +51,22 @@ Danh sách sách
                     <!-- Navigation Tabs -->
                     <ul class="nav nav-tabs mb-4">
                         <li class="nav-item">
-                            <a class="nav-link active" href="/admin/borrowings">Tất cả</a>
+                            <a class="nav-link {{ strpos($_SERVER['REQUEST_URI'], '/admin/borrowings') !== false && strpos($_SERVER['REQUEST_URI'], '/pending') === false && strpos($_SERVER['REQUEST_URI'], '/active') === false && strpos($_SERVER['REQUEST_URI'], '/overdue') === false && strpos($_SERVER['REQUEST_URI'], '/returned') === false && strpos($_SERVER['REQUEST_URI'], '/rejected') === false ? 'active' : '' }}" href="/admin/borrowings">Tất cả</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/borrowings/pending">Chờ duyệt</a>
+                            <a class="nav-link {{ strpos($_SERVER['REQUEST_URI'], '/pending') !== false ? 'active' : '' }}" href="/admin/borrowings/pending">Chờ duyệt</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/borrowings/active">Đang mượn</a>
+                            <a class="nav-link {{ strpos($_SERVER['REQUEST_URI'], '/active') !== false ? 'active' : '' }}" href="/admin/borrowings/active">Đang mượn</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/borrowings/overdue">Quá hạn</a>
+                            <a class="nav-link {{ strpos($_SERVER['REQUEST_URI'], '/overdue') !== false ? 'active' : '' }}" href="/admin/borrowings/overdue">Quá hạn</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ strpos($_SERVER['REQUEST_URI'], '/returned') !== false ? 'active' : '' }}" href="/admin/borrowings/returned">Đã trả</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ strpos($_SERVER['REQUEST_URI'], '/rejected') !== false ? 'active' : '' }}" href="/admin/borrowings/rejected">Đã từ chối</a>
                         </li>
                     </ul>
 
@@ -127,6 +133,18 @@ Danh sách sách
                             </tbody>
                         </table>
                     </div>
+                    <!-- Pagination -->
+                    <?php if (isset($totalPages) && $totalPages > 1): ?>
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
+                                    <a class="page-link" href="<?php echo $baseUrl . '?page=' . $i; ?>"><?php echo $i; ?></a>
+                                </li>
+                            <?php endfor; ?>
+                        </ul>
+                    </nav>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
