@@ -73,4 +73,31 @@ class Post extends Model
         $stmt->execute();
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
+
+    public function getNewOnePost() {
+        $sql = "SELECT p.id, p.title, p.slug, p.content, p.image, p.created_at, p.updated_at, p.status, c.name AS category,
+                       SUBSTRING(p.content, 1, 100) AS short,
+                       CONCAT('/post/', p.slug) AS link
+                FROM posts p
+                LEFT JOIN categories_post c ON p.category_id = c.id
+                WHERE p.status = 'published'
+                ORDER BY p.id DESC
+                LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+    public function getNextFourPosts() {
+        $sql = "SELECT p.id, p.title, p.slug, p.content, p.image, p.created_at, p.updated_at, p.status, c.name AS category,
+                       SUBSTRING(p.content, 1, 100) AS short,
+                       CONCAT('/post/', p.slug) AS link
+                FROM posts p
+                LEFT JOIN categories_post c ON p.category_id = c.id
+                WHERE p.status = 'published'
+                ORDER BY p.id DESC
+                LIMIT 4 OFFSET 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
 }

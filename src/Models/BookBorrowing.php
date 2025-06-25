@@ -83,19 +83,6 @@ class BookBorrowing extends Model {
         return $stmt->fetchAll();
     }
 
-    public function getOverdueBorrowings() {
-        $sql = "SELECT bb.*, b.title, b.author, u.full_name, u.student_id 
-                FROM book_borrowings bb 
-                JOIN books b ON bb.book_id = b.id 
-                JOIN users u ON bb.user_id = u.id 
-                WHERE bb.status = 'approved' 
-                AND bb.return_date < CURDATE()";
-        
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-
     public function getBorrowingStatistics() {
         $sql = "SELECT 
                 COUNT(*) as total_borrowings,
@@ -165,5 +152,32 @@ class BookBorrowing extends Model {
         $stmt->execute($params);
         $result = $stmt->fetch();
         return $result ? (int)$result['total'] : 0;
+    }
+    public function hasPendingBorrowing($userId, $bookId) {
+        $sql = "SELECT id FROM book_borrowings 
+                WHERE user_id = ? AND book_id = ? AND status = 'pending'";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$userId, $bookId]);
+        return $stmt->fetch() !== false;
+    }
+    public function getOverdueBorrowings() {
+        $sql = "SELECT bb.*, b.title, b.author, u.full_name, u.email, u.phone
+                FROM book_borrowings bb
+                LEFT JOIN books b ON bb.book_id = b.id
+                LEFT JOIN users u ON bb.user_id = u.id
+                WHERE bb.status = 'approved' AND bb.return_date < CURDATE()
+                ORDER BY bb.return_date ASC";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    
+    public function returnBook($borrowingId) {
+        $sql = "UPDATE book_borrowings SET status = 'returned', actual_return_date = NOW(), updated_at = NOW() WHERE id = ?";
+        
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([$borrowingId]);
     }
 } 
