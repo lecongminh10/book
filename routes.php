@@ -1,7 +1,6 @@
 <?php
 // Định nghĩa đường dẫn 
 
-
 use Bramus\Router\Router;
 use Lecon\Mvcoop\Controllers\Admin\AuthenticateController;
 use Lecon\Mvcoop\Controllers\Admin\CategoryController;
@@ -14,30 +13,35 @@ use Lecon\Mvcoop\Controllers\Client\PostController as ClientPostController;
 use Lecon\Mvcoop\Controllers\Client\BorrowController;
 use Lecon\Mvcoop\Controllers\Admin\BookController;
 use Lecon\Mvcoop\Controllers\Admin\ShelfController;
+use Lecon\Mvcoop\Controllers\Admin\SettingController;
 
 // Create Router instance
 $router = new Router();
-
-// Define routes
-// ...
-
-
-// Tạo một tuyến đường (route) trong Laravel
+// client routes
 $router->get("/", HomeController::class . '@index');
-
-
-$router-> match('GET|POST' , '/auth/login' , AuthenticateController::class . '@login');
-
+$router->match('GET|POST', '/login', HomeController::class . '@login');
+$router->match('GET|POST', '/register', HomeController::class . '@register');
+$router->get('/logout', HomeController::class . '@logout');
 // Book borrowing routes
 $router->match('GET|POST', '/borrow', BorrowController::class . '@borrowBook');
 $router->get('/my-borrowings', BorrowController::class . '@myBorrowings');
 $router->get('/borrow/cancel/{id}', BorrowController::class . '@cancelBorrowing');
+// 
+$router->get('/', 'Lecon\Mvcoop\Controllers\Client\WebSettingController@index');
 
-$router->mount("/admin", function () use ($router){
-   
-    $router -> get("/" , DashboardController ::class ."@index");
-    $router ->get('/logout' ,   AuthenticateController::class. '@logout');
-
+// admin routes
+$router->match('GET|POST', '/auth/login', AuthenticateController::class . '@login');
+$router->mount("/admin", function () use ($router) {
+    $router->get("/", DashboardController::class . '@index');
+    $router->get('/logout', AuthenticateController::class . '@logout');
+    // web setting routes
+    $router->mount('/settings', function () use ($router) {
+        $router->get('/', SettingController::class . '@index');
+        $router->get('/create', SettingController::class . '@create');
+        $router->get('/show/{id}', SettingController::class . '@show');
+        $router->get('/update/{id}', SettingController::class . '@update');
+        $router->post('/update/{id}', SettingController::class . '@update');
+    });
     // Book borrowing management routes
     $router->mount('/borrowings', function () use ($router) {
         $router->get('/', BorrowingController::class . '@index');
@@ -51,7 +55,6 @@ $router->mount("/admin", function () use ($router){
         $router->get('/reject/{id}', BorrowingController::class . '@reject');
         $router->get('/return/{id}', BorrowingController::class . '@return');
     });
-
 
     $router->mount('/books', function () use ($router) {
         $router->get('/', BookController::class . '@index');
@@ -68,23 +71,20 @@ $router->mount("/admin", function () use ($router){
         $router->get('(\d+)/positions', ShelfController::class . '@getPositionsJson');
     });
 
-
     $router->mount('/users', function () use ($router) {
-        $router->get('/',                           UserController::class . '@index');
-        $router->get('/{id}/show',                  UserController::class . '@show');
-        $router->get('/{id}/delete',                UserController::class . '@delete');
-        $router->match('GET|POST', '/{id}/update',  UserController::class . '@update');
-        $router->match('GET|POST', '/create',       UserController::class . '@create');
+        $router->get('/', UserController::class . '@index');
+        $router->get('/{id}/show', UserController::class . '@show');
+        $router->get('/{id}/delete', UserController::class . '@delete');
+        $router->match('GET|POST', '/{id}/update', UserController::class . '@update');
+        $router->match('GET|POST', '/create', UserController::class . '@create');
     });
     $router->mount('/categorys', function () use ($router) {
-        $router->get('/',                          CategoryController::class . '@index');
-        $router->get('/{id}/show',                 CategoryController::class . '@show');
-        $router->get('/{id}/delete',               CategoryController::class . '@delete');
-        $router->match('GET|POST', '/{id}/update',  CategoryController::class . '@update');
-        $router->match('GET|POST', '/create',       CategoryController::class . '@create');
+        $router->get('/', CategoryController::class . '@index');
+        $router->get('/{id}/show', CategoryController::class . '@show');
+        $router->get('/{id}/delete', CategoryController::class . '@delete');
+        $router->match('GET|POST', '/{id}/update', CategoryController::class . '@update');
+        $router->match('GET|POST', '/create', CategoryController::class . '@create');
     });
-
-
 });
 
 $router->before('GET|POST', '/admin/*', function() {
@@ -97,9 +97,6 @@ $router->before('GET|POST', '/admin/*', function() {
         exit();
     }
 });
-
-
-
 
 // Giải thích từng phần:
 // - $router: Đối tượng định tuyến trong Laravel, sử dụng để định rõ các tuyến của ứng dụng.

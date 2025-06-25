@@ -1,5 +1,6 @@
 <footer id="footer" class="footer">
 
+<!-- ======= Footer Section ======= -->
 
 <div class="footer-legal">
     <div class="container">
@@ -7,7 +8,8 @@
         <div class="row justify-content-between">
             <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
                 <div class="copyright">
-                    © Copyright <strong><span>ZenBlog</span></strong>. Minhlcph40002
+                     <p>{{ $footer ?? '© 2025 ZenBlog. All rights reserved.' }}</p>
+                    <p>Hotline: {{ $hotline ?? '0901234567' }}</p>
                 </div>
 
 
