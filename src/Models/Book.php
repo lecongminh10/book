@@ -27,11 +27,11 @@ class Book extends Model {
     }
 
     public function getBookById($id) {
-        $sql = "SELECT b.*, c.name as category_name 
+        $sql = "SELECT b.*, c.name as category_name, sp.title as shelf_position_title
                 FROM books b 
                 LEFT JOIN categories c ON b.category_id = c.id 
+                LEFT JOIN shelf_positions sp ON b.shelf_position_id = sp.id
                 WHERE b.id = ?";
-        
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$id]);
         return $stmt->fetch();
@@ -62,9 +62,8 @@ class Book extends Model {
 
     public function createBook($data) {
         $sql = "INSERT INTO books (title, author, category_id, publish_year, isbn, 
-                location_description, cover_front, cover_back, summary, content, is_featured) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
+                location_description, cover_front, cover_back, summary, content, is_featured, shelf_position_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute([
             $data['title'],
@@ -77,7 +76,8 @@ class Book extends Model {
             $data['cover_back'],
             $data['summary'],
             $data['content'],
-            $data['is_featured'] ?? 0
+            $data['is_featured'] ?? 0,
+            $data['shelf_id'] ?? null
         ]);
     }
 
@@ -93,9 +93,9 @@ class Book extends Model {
                 cover_back = ?, 
                 summary = ?, 
                 content = ?, 
-                is_featured = ? 
+                is_featured = ?,
+                shelf_position_id = ?
                 WHERE id = ?";
-        
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute([
             $data['title'],
@@ -109,6 +109,7 @@ class Book extends Model {
             $data['summary'],
             $data['content'],
             $data['is_featured'] ?? 0,
+            $data['shelf_position_id'] ?? null,
             $id
         ]);
     }

@@ -13,26 +13,90 @@ class BorrowingController extends Controller {
     }
 
     public function index() {
-        $data = $this->borrowingModel->getAllBorrowings();
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
+        $borrowings = $this->borrowingModel->getBorrowingsPaginated(null, $limit, $offset);
+        $total = $this->borrowingModel->countBorrowings();
+        $stats = $this->borrowingModel->getBorrowingStatistics();
+        $totalPages = ceil($total / $limit);
         return $this->renderViewAdmin(
             $this->folder . __FUNCTION__,
-            $data
+            [
+                'borrowings' => $borrowings,
+                'stats' => $stats,
+                'page' => $page,
+                'totalPages' => $totalPages,
+                'baseUrl' => '/admin/borrowings'
+            ]
         );
     }
 
     public function pending() {
-        $borrowings = $this->borrowingModel->getPendingBorrowings();
-        require_once __DIR__ . '/../../Views/admin/borrowings/pending.php';
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
+        $borrowings = $this->borrowingModel->getBorrowingsPaginated('pending', $limit, $offset);
+        $total = $this->borrowingModel->countBorrowings('pending');
+        $stats = $this->borrowingModel->getBorrowingStatistics();
+        $totalPages = ceil($total / $limit);
+        return $this->renderViewAdmin(
+            $this->folder . 'index',
+            [
+                'borrowings' => $borrowings,
+                'stats' => $stats,
+                'page' => $page,
+                'totalPages' => $totalPages,
+                'baseUrl' => '/admin/borrowings/pending'
+            ]
+        );
     }
 
     public function active() {
-        $borrowings = $this->borrowingModel->getActiveBorrowings();
-        require_once __DIR__ . '/../../Views/admin/borrowings/active.php';
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
+        $borrowings = $this->borrowingModel->getBorrowingsPaginated('approved', $limit, $offset);
+        $total = $this->borrowingModel->countBorrowings('approved');
+        $stats = $this->borrowingModel->getBorrowingStatistics();
+        $totalPages = ceil($total / $limit);
+        return $this->renderViewAdmin(
+            $this->folder . 'index',
+            [
+                'borrowings' => $borrowings,
+                'stats' => $stats,
+                'page' => $page,
+                'totalPages' => $totalPages,
+                'baseUrl' => '/admin/borrowings/active'
+            ]
+        );
     }
 
     public function overdue() {
-        $borrowings = $this->borrowingModel->getOverdueBorrowings();
-        require_once __DIR__ . '/../../Views/admin/borrowings/overdue.php';
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
+        // Quá hạn là approved và return_date < hôm nay
+        $borrowings = $this->borrowingModel->getBorrowingsPaginated('approved', $limit, $offset);
+        // Lọc lại trong PHP nếu cần, hoặc viết hàm riêng nếu muốn tối ưu hơn
+        $borrowings = array_filter($borrowings, function($b) {
+            return strtotime($b['return_date']) < strtotime(date('Y-m-d'));
+        });
+        $total = count($borrowings);
+        $stats = $this->borrowingModel->getBorrowingStatistics();
+        $totalPages = ceil($total / $limit);
+        // Lấy đúng page
+        $borrowings = array_slice($borrowings, 0, $limit);
+        return $this->renderViewAdmin(
+            $this->folder . 'index',
+            [
+                'borrowings' => $borrowings,
+                'stats' => $stats,
+                'page' => $page,
+                'totalPages' => $totalPages,
+                'baseUrl' => '/admin/borrowings/overdue'
+            ]
+        );
     }
 
     public function approve($id) {
@@ -114,6 +178,46 @@ class BorrowingController extends Controller {
 
         header('Location: /admin/borrowings');
         exit();
+    }
+
+    public function returned() {
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
+        $borrowings = $this->borrowingModel->getBorrowingsPaginated('returned', $limit, $offset);
+        $total = $this->borrowingModel->countBorrowings('returned');
+        $stats = $this->borrowingModel->getBorrowingStatistics();
+        $totalPages = ceil($total / $limit);
+        return $this->renderViewAdmin(
+            $this->folder . 'index',
+            [
+                'borrowings' => $borrowings,
+                'stats' => $stats,
+                'page' => $page,
+                'totalPages' => $totalPages,
+                'baseUrl' => '/admin/borrowings/returned'
+            ]
+        );
+    }
+
+    public function rejected() {
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
+        $borrowings = $this->borrowingModel->getBorrowingsPaginated('rejected', $limit, $offset);
+        $total = $this->borrowingModel->countBorrowings('rejected');
+        $stats = $this->borrowingModel->getBorrowingStatistics();
+        $totalPages = ceil($total / $limit);
+        return $this->renderViewAdmin(
+            $this->folder . 'index',
+            [
+                'borrowings' => $borrowings,
+                'stats' => $stats,
+                'page' => $page,
+                'totalPages' => $totalPages,
+                'baseUrl' => '/admin/borrowings/rejected'
+            ]
+        );
     }
 
     public function statistics() {

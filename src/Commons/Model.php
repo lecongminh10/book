@@ -32,6 +32,12 @@ class Model
         echo "<pre>";
         print_r($this->conn);
     }
+
+    public function getConnection()
+    {
+        return $this->conn;
+    }
+
     public function __destruct()
     {
         $this->conn = null;
