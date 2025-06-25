@@ -231,6 +231,7 @@ public function getBooksByCategoryAll()
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+    }
     public function list_book_cat($id) {
             if (!is_numeric($id) || $id <= 0) {
                 error_log("Invalid category ID: $id");
