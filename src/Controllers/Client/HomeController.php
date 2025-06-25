@@ -16,11 +16,13 @@ class HomeController extends Controller
     private User $user;
     private Category $category;
     private $book;
+    private $post;
     public function __construct()
     {
         $this->category = new Category;
         $this->user = new User();
         $this->book = new Book();
+        $this->post = new Post();
     }
     public function index()
     {
@@ -47,7 +49,10 @@ class HomeController extends Controller
 
         }
 
-        $books = $this->book->getBooksPaginated(12, 0);
+        $books = $this->book->new_getBoosk();
+        $hot_books = $this->book->hot_getBoosk();
+        $new_post = $this->post->getNewOnePost();
+        $four_post = $this->post->getNextFourPosts();
 
 
         // Trả về view với dữ liệu được truyền đi
@@ -64,7 +69,10 @@ class HomeController extends Controller
                 'footer' => $footer,
                 'hotline' => $hotline,
                 'title_logo' => $title_logo,
-                'books'=>$books
+                'books'=>$books,
+                'hot_books'=>$hot_books,
+                'new_post'=>$new_post,
+                'four_post'=>$four_post
             ]
         );
     }
@@ -76,6 +84,13 @@ class HomeController extends Controller
     }
     public function login()
     {
+        $webSetting = new WebSetting();
+        $logo = $webSetting->getByName('logo')['value'] ?? '/assets/client/assets/img/logo.png';
+        $slide_1 = $webSetting->getByName('slide_1')['value'] ?? '/assets/client/assets/img/slide1.jpg';
+        $footer = $webSetting->getByName('footer')['value'] ?? '© 2025 ZenBlog. All rights reserved.';
+        $hotline = $webSetting->getByName('hotline')['value'] ?? '0901234567';
+        $title_logo =  $webSetting->getByName('title_logo')['value'] ?? 'ZEN BLOG';
+        $categories = $this->category->getAll();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
@@ -91,11 +106,25 @@ class HomeController extends Controller
                 return $this->renderViewClient('login', ['error' => 'Invalid credentials']);
             }
         }
-        return $this->renderViewClient('login');
+        return $this->renderViewClient('login',[
+            'categories' => $categories,
+            'logo' => $logo,
+            'slide_1' => $slide_1,
+            'footer' => $footer,
+            'hotline' => $hotline,
+            'title_logo' => $title_logo,
+        ]);
     }
 
    public function register()
     {
+        $webSetting = new WebSetting();
+        $logo = $webSetting->getByName('logo')['value'] ?? '/assets/client/assets/img/logo.png';
+        $slide_1 = $webSetting->getByName('slide_1')['value'] ?? '/assets/client/assets/img/slide1.jpg';
+        $footer = $webSetting->getByName('footer')['value'] ?? '© 2025 ZenBlog. All rights reserved.';
+        $hotline = $webSetting->getByName('hotline')['value'] ?? '0901234567';
+        $title_logo =  $webSetting->getByName('title_logo')['value'] ?? 'ZEN BLOG';
+        $categories = $this->category->getAll();
         // Kiểm tra nếu đã đăng nhập, chuyển hướng về trang chủ
         if (isset($_SESSION['user'])) {
             header('Location: /');
@@ -130,7 +159,14 @@ class HomeController extends Controller
             header('Location: /login');
             exit();
         }
-        return $this->renderViewClient('register');
+        return $this->renderViewClient('register',[
+            'categories' => $categories,
+            'logo' => $logo,
+            'slide_1' => $slide_1,
+            'footer' => $footer,
+            'hotline' => $hotline,
+            'title_logo' => $title_logo,
+        ]);
     }
 
     public function logout()
@@ -140,5 +176,41 @@ class HomeController extends Controller
         exit();
     }
 
+    public function about()
+    {   $webSetting = new WebSetting();
+        $logo = $webSetting->getByName('logo')['value'] ?? '/assets/client/assets/img/logo.png';
+        $slide_1 = $webSetting->getByName('slide_1')['value'] ?? '/assets/client/assets/img/slide1.jpg';
+        $footer = $webSetting->getByName('footer')['value'] ?? '© 2025 ZenBlog. All rights reserved.';
+        $hotline = $webSetting->getByName('hotline')['value'] ?? '0901234567';
+        $title_logo =  $webSetting->getByName('title_logo')['value'] ?? 'ZEN BLOG';
+        $categories = $this->category->getAll();
+        return $this->renderViewClient('about',[
+            'categories' => $categories,
+            'logo' => $logo,
+            'slide_1' => $slide_1,
+            'footer' => $footer,
+            'hotline' => $hotline,
+            'title_logo' => $title_logo,
+        ]);
+    }
+
+    public function contact()
+    {
+        $webSetting = new WebSetting();
+        $logo = $webSetting->getByName('logo')['value'] ?? '/assets/client/assets/img/logo.png';
+        $slide_1 = $webSetting->getByName('slide_1')['value'] ?? '/assets/client/assets/img/slide1.jpg';
+        $footer = $webSetting->getByName('footer')['value'] ?? '© 2025 ZenBlog. All rights reserved.';
+        $hotline = $webSetting->getByName('hotline')['value'] ?? '0901234567';
+        $title_logo =  $webSetting->getByName('title_logo')['value'] ?? 'ZEN BLOG';
+        $categories = $this->category->getAll();
+        return $this->renderViewClient('contact',[
+            'categories' => $categories,
+            'logo' => $logo,
+            'slide_1' => $slide_1,
+            'footer' => $footer,
+            'hotline' => $hotline,
+            'title_logo' => $title_logo,
+        ]);
+    }
 
 }

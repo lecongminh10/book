@@ -16,6 +16,7 @@ use Lecon\Mvcoop\Controllers\Admin\CategoryPostController;
 use Lecon\Mvcoop\Controllers\Admin\PostController;
 use Lecon\Mvcoop\Controllers\Admin\ShelfController;
 use Lecon\Mvcoop\Controllers\Admin\SettingController;
+use Lecon\Mvcoop\Controllers\Client\BookDetailController;
 
 // Create Router instance
 $router = new Router();
@@ -114,7 +115,12 @@ $router->before('GET|POST', '/admin/*', function() {
         exit();
     }
 });
-
+$router->get('/about', HomeController::class . '@about');
+$router->get('/contact', HomeController::class . '@contact');
+$router->get('/book-detail/{id}', BookDetailController::class . '@index');
+$router->get('/book/read/{id}', BookDetailController::class . '@read');
+$router->post('/book/reserve/([0-9]+)', BookDetailController::class . '@reserve');
+$router->get('/categorise/{id}', BookDetailController::class . '@list_book_cat');
 // Giải thích từng phần:
 // - $router: Đối tượng định tuyến trong Laravel, sử dụng để định rõ các tuyến của ứng dụng.
 // - get("/"): Tạo một tuyến với phương thức HTTP là GET và đường dẫn là "/" (đường dẫn gốc).
