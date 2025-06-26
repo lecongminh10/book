@@ -212,7 +212,7 @@
         <div class="container bg-white rounded shadow-sm p-3">
             <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
                 <h3 class="fw-bold mb-0" style="font-size:1.5rem;letter-spacing:1px;">TIN TỨC MỚI NHẤT</h3>
-                <a href="#" class="text-danger fw-bold" style="font-size:1rem;">Xem tất cả <span
+                <a href="/post" class="text-danger fw-bold" style="font-size:1rem;">Xem tất cả <span
                         class="ms-1">&rsaquo;</span></a>
             </div>
 
@@ -226,7 +226,7 @@
                                 {{ $new_post['category'] }}
                             </div>
                             <h5 class="fw-bold mb-2" style="font-size:1.15rem;">{{ $new_post['title'] }}</h5>
-                            <a href="{{ $new_post['link'] }}" class="text-danger fw-bold">Đọc tiếp</a>
+                            <a href="/post/{{ $new_post['id'] }}" class="text-danger fw-bold">Đọc tiếp</a>
                         </div>
                     </div>
                 </div>
@@ -238,7 +238,7 @@
                                     style="width:60px;height:60px;object-fit:cover;border-radius:8px;" class="me-3">
                                 <div class="flex-grow-1">
                                     <div class="fw-bold" style="font-size:1rem;">{{ $item['title'] }}</div>
-                                    <a href="{{ $item['link'] }}" class="text-danger small">Đọc tiếp</a>
+                                    <a href="/post/{{ $item['id'] }}" class="text-danger small">Đọc tiếp</a>
                                 </div>
                             </div>
                         @endforeach

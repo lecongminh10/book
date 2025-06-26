@@ -38,9 +38,11 @@ class Book extends Model {
     }
 
     public function searchBooks($keyword) {
-        $sql = "SELECT b.*, c.name as category_name 
+        $sql = "SELECT b.*, c.name as category_name ,
+                AVG(b_r.rating) AS average_rating 
                 FROM books b 
                 LEFT JOIN categories c ON b.category_id = c.id 
+                LEFT JOIN book_ratings b_r ON b_r.book_id = b.id
                 WHERE b.title LIKE ? OR b.author LIKE ? OR b.summary LIKE ?";
         
         $keyword = "%$keyword%";

@@ -159,6 +159,9 @@ $router->get('/book-detail/{id}', BookDetailController::class . '@index');
 $router->get('/book/read/{id}', BookDetailController::class . '@read');
 $router->post('/book/reserve/([0-9]+)', BookDetailController::class . '@reserve');
 $router->get('/categorise/{id}', BookDetailController::class . '@list_book_cat');
+$router->get('/post', HomeController::class . '@post');
+$router->get('/post/{id}', HomeController::class . '@detail_post');
+$router->get('/search_book', HomeController::class . '@search_book');
 // Giải thích từng phần:
 // - $router: Đối tượng định tuyến trong Laravel, sử dụng để định rõ các tuyến của ứng dụng.
 // - get("/"): Tạo một tuyến với phương thức HTTP là GET và đường dẫn là "/" (đường dẫn gốc).

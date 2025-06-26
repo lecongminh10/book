@@ -5,7 +5,7 @@
         @if (!isset($anh))
         <a href="/post/{{$post['p_id']}}"><img src="{{ $post['p_image']}}" alt="" class="img-fluid"></a>
         @endif
-        <div class="post-meta"><span class="date">{{ $post['c_name'] }}</span> <span class="mx-1">&bullet;</span> <span>Jul 5th '22</span></div>
+        <div class="post-meta"><span class="date">{{ $post['c_name'] }}</span> <span class="mx-1">&bullet;</span></div>
         <h4><a href="/post/{{$post['p_id']}}">{{$post['p_title'] }}</a></h4>
     
         @if(!isset($hiddenExcerpt) )
@@ -27,9 +27,9 @@
 @else
 <div class="post-entry-1 lg">
     @if (!isset($anh))
-    <a href="/post/{{$post['p_id']}}"><img src="{{ $post['p_image']}}" alt="" class="img-fluid"></a>
+    <a href="/post/{{$post['p_id']}}"><img src="/{{ $post['p_image']}}" alt="" class="img-fluid"></a>
     @endif
-    <div class="post-meta"><span class="date">{{ $post['c_name'] }}</span> <span class="mx-1">&bullet;</span> <span>Jul 5th '22</span></div>
+    <div class="post-meta"><span class="date">{{ $post['c_name'] }}</span> <span class="mx-1">&bullet;</span> </div>
     <h4><a href="/post/{{$post['p_id']}}">{{$post['p_title'] }}</a></h4>
 
     @if(!isset($hiddenExcerpt) )
