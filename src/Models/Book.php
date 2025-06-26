@@ -14,17 +14,17 @@ class Book extends Model {
         return $stmt->fetchAll();
     }
 
-    public function getFeaturedBooks() {
-        $sql = "SELECT b.*, c.name as category_name 
-                FROM books b 
-                LEFT JOIN categories c ON b.category_id = c.id 
-                WHERE b.is_featured = 1 
-                ORDER BY b.created_at DESC";
+    // public function getFeaturedBooks() {
+    //     $sql = "SELECT b.*, c.name as category_name 
+    //             FROM books b 
+    //             LEFT JOIN categories c ON b.category_id = c.id 
+    //             WHERE b.is_featured = 1 
+    //             ORDER BY b.created_at DESC";
         
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
+    //     $stmt = $this->conn->prepare($sql);
+    //     $stmt->execute();
+    //     return $stmt->fetchAll();
+    // }
 
     public function getBookById($id) {
         $sql = "SELECT b.*, c.name as category_name, sp.title as shelf_position_title
@@ -186,7 +186,7 @@ class Book extends Model {
         $result = $stmt->fetch();
         return $result ? (int)$result['total'] : 0;
     }
-public function getBooksByCategoryAll()
+    public function getBooksByCategoryAll()
     {
         $sql = "
             SELECT c.name AS category_name, COUNT(b.id) AS book_count
@@ -259,4 +259,63 @@ public function getBooksByCategoryAll()
 
             return $books ?: [];
     }
+    // Thống kê sách mới nhất
+public function getLatestBooks($limit = 5)
+{
+    $sql = "
+        SELECT b.*, c.name AS category_name
+        FROM books b
+        LEFT JOIN categories c ON b.category_id = c.id
+        ORDER BY b.created_at DESC
+        LIMIT :limit
+    ";
+    
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+}
+
+// Thống kê sách nổi bật
+public function getFeaturedBooks()
+{
+    $sql = "
+        SELECT b.*, c.name AS category_name
+        FROM books b
+        LEFT JOIN categories c ON b.category_id = c.id
+        WHERE b.is_featured = 1
+        ORDER BY b.created_at DESC
+    ";
+    
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+}
+
+// Thống kê tổng số sách
+public function getTotalBooksCount()
+{
+    $sql = "SELECT COUNT(*) as total FROM books";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $result['total'] ?? 0;
+}
+
+// Thống kê sách theo năm xuất bản
+public function getBooksByPublishYear()
+{
+    $sql = "
+        SELECT publish_year, COUNT(*) AS book_count
+        FROM books
+        WHERE publish_year IS NOT NULL
+        GROUP BY publish_year
+        ORDER BY publish_year DESC
+        LIMIT 10
+    ";
+    
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+}
 } 

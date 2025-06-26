@@ -100,4 +100,45 @@ class Post extends Model
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+    // Thống kê tổng số bài viết
+public function getTotalPostsCount()
+{
+    $sql = "SELECT COUNT(*) as total FROM posts";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $result['total'] ?? 0;
+}
+public function getPostsByStatus()
+{
+    $sql = "
+        SELECT status, COUNT(*) AS post_count
+        FROM posts
+        GROUP BY status
+        ORDER BY post_count DESC
+    ";
+    
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+}
+
+// Thống kê bài viết mới nhất
+public function getLatestPosts($limit = 5)
+{
+    $sql = "
+        SELECT p.*, cp.name AS category_name, u.full_name AS author_name
+        FROM posts p
+        LEFT JOIN categories_post cp ON p.category_id = cp.id
+        LEFT JOIN users u ON p.user_id = u.id
+        ORDER BY p.created_at DESC
+        LIMIT :limit
+    ";
+    
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+}
+
 }

@@ -57,4 +57,29 @@ class Shelf extends Model {
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute([$name, $location_note, $id]);
     }
+    public function getTotalShelvesCount()
+{
+    $sql = "SELECT COUNT(*) as total FROM shelves";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $result['total'] ?? 0;
+}
+
+// Thống kê vị trí kệ có sách
+public function getShelvesWithBooks()
+{
+    $sql = "
+        SELECT s.name AS shelf_name, COUNT(b.id) AS book_count
+        FROM shelves s
+        LEFT JOIN shelf_positions sp ON s.id = sp.shelf_id
+        LEFT JOIN books b ON sp.id = b.shelf_position_id
+        GROUP BY s.id, s.name
+        ORDER BY book_count DESC
+    ";
+    
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+}
 }
