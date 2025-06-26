@@ -24,7 +24,7 @@ use Lecon\Mvcoop\Controllers\Client\BookDetailController;
 $router = new Router();
 
 // Client routes
-$router->get('/', WebSettingController::class . '@index');
+$router->get('/', HomeController::class . '@index');
 $router->match('GET|POST', '/login', HomeController::class . '@login');
 $router->match('GET|POST', '/register', HomeController::class . '@register');
 $router->get('/logout', HomeController::class . '@logout');
@@ -33,6 +33,8 @@ $router->get('/logout', HomeController::class . '@logout');
 $router->get('/profile', ProfileController::class . '@index');
 $router->post('/profile/update', ProfileController::class . '@update');
 $router->post('/profile/change-password', ProfileController::class . '@changePassword');
+$router->post('/profile/save-rating', ProfileController::class . '@saveRating');
+$router->get('/profile/get-rating', ProfileController::class . '@getRating');
 
 // Book borrowing routes
 $router->match('GET|POST', '/borrow', BorrowController::class . '@borrowBook');
@@ -136,7 +138,7 @@ $router->before('GET|POST', '/admin/*', function() {
         exit();
     }
 });
-// Middleware for profile routes - require user authentication
+//check đăng nhập
 $router->before('GET|POST', '/profile*', function() {
     if (!isset($_SESSION['user'])) {
         header('Location: /login');

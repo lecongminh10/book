@@ -79,7 +79,7 @@ class BookDetailController extends Controller {
     public function read($id) {
         try {
             // Kiểm tra xem người dùng đã đăng nhập chưa
-            if (!isset($_SESSION['user'])) {
+            if (!$_SESSION['user']) {
                 $_SESSION['error'] = 'Vui lòng đăng nhập để đọc sách online.';
                 header("Location: /login");
                 return;
@@ -225,12 +225,25 @@ class BookDetailController extends Controller {
     }
     public function list_book_cat($categoryId) {
         try {
+            $webSetting = new WebSetting();
+            $logo = $webSetting->getByName('logo')['value'] ?? '/assets/client/assets/img/logo.png';
+            $slide_1 = $webSetting->getByName('slide_1')['value'] ?? '/assets/client/assets/img/slide1.jpg';
+            $footer = $webSetting->getByName('footer')['value'] ?? '© 2025 ZenBlog. All rights reserved.';
+            $hotline = $webSetting->getByName('hotline')['value'] ?? '0901234567';
+            $title_logo =  $webSetting->getByName('title_logo')['value'] ?? 'ZEN BLOG';
+            $categories = $this->categoryModel->getAll();
             $books = $this->bookModel->list_book_cat($categoryId);
             $cat = $this->categoryModel->getByID($categoryId);
             $name_cat = $cat['name'];
             return $this->renderViewClient('book-list', [
                 'books' => $books,
-                'categoryId' => $name_cat
+                'categoryId' => $name_cat,
+                'categories' => $categories,
+                'logo' => $logo,
+                'slide_1' => $slide_1,
+                'footer' => $footer,
+                'hotline' => $hotline,
+                'title_logo' => $title_logo,
             ]);
         } catch (\Exception $e) {
             error_log("Error in listByCategory for categoryId $categoryId: " . $e->getMessage());

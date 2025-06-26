@@ -180,4 +180,11 @@ class BookBorrowing extends Model {
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute([$borrowingId]);
     }
+    public function hasReturnBorrowing($userId, $borrowId) {
+        $sql = "SELECT * FROM book_borrowings 
+                WHERE user_id = ? AND id = ? AND status = 'returned'";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$userId, $borrowId]);
+        return $stmt->fetch();
+    }
 } 

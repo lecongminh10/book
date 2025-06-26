@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-<div class="container book-list-container mt-5">
+<div class="container book-list-container mt-5" style="margin-bottom: 100px">
     <h2>Sách theo danh mục #{{ $categoryId }}</h2>
     @if(empty($books))
         <p class="text-muted">Không có sách nào trong danh mục này.</p>
