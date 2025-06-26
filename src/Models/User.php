@@ -193,4 +193,44 @@ class User extends Model
             die;
         }
     }
+    public function getTotalUsersCount()
+    {
+        $sql = "SELECT COUNT(*) as total FROM users WHERE role != 'admin'";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result['total'] ?? 0;
+    }
+
+    // Thống kê người dùng mới nhất
+    public function getLatestUsers($limit = 5)
+    {
+        $sql = "
+            SELECT id, username, email, full_name, role, created_at
+            FROM users
+            WHERE role != 'admin'
+            ORDER BY created_at DESC
+            LIMIT :limit
+        ";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+    }
+
+    // Thống kê người dùng theo vai trò
+    public function getUsersByRole()
+    {
+        $sql = "
+            SELECT role, COUNT(*) AS user_count
+            FROM users
+            GROUP BY role
+            ORDER BY user_count DESC
+        ";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+    }
 }

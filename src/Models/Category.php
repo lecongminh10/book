@@ -103,5 +103,12 @@ class Category extends Model
             die;
         }
     }
-
+public function getTotalCategoriesCount()
+{
+    $sql = "SELECT COUNT(*) as total FROM categories";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $result['total'] ?? 0;
+}
 }

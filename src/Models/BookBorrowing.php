@@ -180,6 +180,87 @@ class BookBorrowing extends Model {
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute([$borrowingId]);
     }
+    // Thống kê tổng số lượt mượn
+public function getTotalBorrowingsCount()
+{
+    $sql = "SELECT COUNT(*) as total FROM book_borrowings";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $result['total'] ?? 0;
+}
+
+// Thống kê theo trạng thái mượn
+public function getBorrowingsByStatus()
+{
+    $sql = "
+        SELECT status, COUNT(*) AS borrowing_count
+        FROM book_borrowings
+        GROUP BY status
+        ORDER BY borrowing_count DESC
+    ";
+    
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+}
+
+// Thống kê mượn sách gần đây
+public function getRecentBorrowings($limit = 10)
+{
+    $sql = "
+        SELECT bb.*, u.full_name, u.username, b.title
+        FROM book_borrowings bb
+        LEFT JOIN users u ON bb.user_id = u.id
+        LEFT JOIN books b ON bb.book_id = b.id
+        ORDER BY bb.created_at DESC
+        LIMIT :limit
+    ";
+    
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+}
+
+// Thống kê sách được mượn nhiều nhất
+public function getMostBorrowedBooks($limit = 10)
+{
+    $sql = "
+        SELECT b.title, b.author, COUNT(bb.id) AS borrow_count
+        FROM books b
+        LEFT JOIN book_borrowings bb ON b.id = bb.book_id
+        GROUP BY b.id, b.title, b.author
+        HAVING borrow_count > 0
+        ORDER BY borrow_count DESC
+        LIMIT :limit
+    ";
+    
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+}
+
+// Thống kê người dùng mượn nhiều nhất
+public function getMostActiveBorrowers($limit = 10)
+{
+    $sql = "
+        SELECT u.full_name, u.username, COUNT(bb.id) AS borrow_count
+        FROM users u
+        LEFT JOIN book_borrowings bb ON u.id = bb.user_id
+        GROUP BY u.id, u.full_name, u.username
+        HAVING borrow_count > 0
+        ORDER BY borrow_count DESC
+        LIMIT :limit
+    ";
+    
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+}
+
     public function hasReturnBorrowing($userId, $borrowId) {
         $sql = "SELECT * FROM book_borrowings 
                 WHERE user_id = ? AND id = ? AND status = 'returned'";
