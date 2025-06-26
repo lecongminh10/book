@@ -34,10 +34,11 @@
 
             <!-- ======= Search Form ======= -->
             <div class="search-form-wrap js-search-form-wrap">
-                <form action="search-result.html" class="search-form">
+                <form action="/search_book" class="search-form" >
                     <span class="icon bi-search"></span>
-                    <input type="text" placeholder="Search" class="form-control">
-                    <button class="btn js-search-close"><span class="bi-x"></span></button>
+                    <input type="text" name="keyword" placeholder="Search" class="form-control">
+                    <button type="submit" class="btn"><span class="bi-search"></span></button>
+                    <button type="button" class="btn js-search-close"><span class="bi-x"></span></button>
                 </form>
             </div><!-- End Search Form -->
         </div>
@@ -47,12 +48,24 @@
                 <a href="/login" class="mx-2">Đăng nhập</a>
                 <a href="/register" class="mx-2">Đăng ký</a>
             @else
-                <a href="/logout" class="mx-2">Đăng xuất</a>
-                @if(isset($_SESSION['user']['full_name']))
-                    <span class="mx-2">Xin chào, {{ $_SESSION['user']['full_name'] }}</span>
-                @else
-                    <span class="mx-2">Xin chào, Người dùng</span>
-                @endif
+                <!-- User dropdown menu -->
+                <div class="dropdown d-inline">
+                    <a class="dropdown-toggle mx-2" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        @if(isset($_SESSION['user']['full_name']))
+                            <i class="fas fa-user"></i> {{ $_SESSION['user']['full_name'] }}
+                        @else
+                            <i class="fas fa-user"></i> Người dùng
+                        @endif
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="/profile"><i class="fas fa-user-cog"></i> Hồ sơ cá nhân</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+                    </ul>
+                </div>
             @endif
         </div>
     </div>

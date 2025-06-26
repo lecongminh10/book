@@ -71,6 +71,30 @@ class ShelfPosition extends Model {
             throw $e;
         }
     }
+    public function getTotalPositionsCount()
+{
+    $sql = "SELECT COUNT(*) as total FROM shelf_positions";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $result['total'] ?? 0;
+}
 
+// Thống kê vị trí kệ trống
+public function getEmptyPositions()
+{
+    $sql = "
+        SELECT sp.*, s.name AS shelf_name
+        FROM shelf_positions sp
+        LEFT JOIN shelves s ON sp.shelf_id = s.id
+        LEFT JOIN books b ON sp.id = b.shelf_position_id
+        WHERE b.id IS NULL
+        ORDER BY s.name, sp.title
+    ";
+    
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+}
     
 } 

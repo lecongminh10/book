@@ -1,12 +1,12 @@
 @extends('layouts.master')
 
 @section('title')
-    Sách theo danh mục #{{ $categoryId }}
+    Sách tìm kiếm  #{{ $search_keyword }}
 @endsection
 
 @section('content')
 <div class="container book-list-container mt-5" style="margin-bottom: 100px">
-    <h2>Sách theo danh mục #{{ $categoryId }}</h2>
+    <h2>Sách tìm kiếm  #{{ $search_keyword }}</h2>
     @if(empty($books))
         <p class="text-muted">Không có sách nào trong danh mục này.</p>
     @else

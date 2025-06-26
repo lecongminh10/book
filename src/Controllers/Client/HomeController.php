@@ -213,4 +213,114 @@ class HomeController extends Controller
         ]);
     }
 
+
+    public function post()
+    {
+        $webSetting = new WebSetting();
+        $logo = $webSetting->getByName('logo')['value'] ?? '/assets/client/assets/img/logo.png';
+        $slide_1 = $webSetting->getByName('slide_1')['value'] ?? '/assets/client/assets/img/slide1.jpg';
+        $footer = $webSetting->getByName('footer')['value'] ?? '© 2025 ZenBlog. All rights reserved.';
+        $hotline = $webSetting->getByName('hotline')['value'] ?? '0901234567';
+        $title_logo =  $webSetting->getByName('title_logo')['value'] ?? 'ZEN BLOG';
+        $categories = $this->category->getAll();
+
+        // Pagination
+        $perPage = 6;
+        $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+        $offset = ($page - 1) * $perPage;
+        $totalPosts = $this->post->countAll();
+        $totalPages = ceil($totalPosts / $perPage);
+        $posts = $this->post->getAllWithCategory($perPage, $offset);
+
+        return $this->renderViewClient('list-post',[
+            'logo' => $logo,
+            'slide_1' => $slide_1,
+            'footer' => $footer,
+            'hotline' => $hotline,
+            'title_logo' => $title_logo,
+            'posts' => $posts,
+            'categories' => $categories,
+            'page' => $page,
+            'totalPages' => $totalPages,
+        ]);
+    }
+
+    public function detail_post($id){
+        $webSetting = new WebSetting();
+        $logo = $webSetting->getByName('logo')['value'] ?? '/assets/client/assets/img/logo.png';
+        $slide_1 = $webSetting->getByName('slide_1')['value'] ?? '/assets/client/assets/img/slide1.jpg';
+        $footer = $webSetting->getByName('footer')['value'] ?? '© 2025 ZenBlog. All rights reserved.';
+        $hotline = $webSetting->getByName('hotline')['value'] ?? '0901234567';
+        $title_logo =  $webSetting->getByName('title_logo')['value'] ?? 'ZEN BLOG';
+        $categories = $this->category->getAll();
+
+        // Lấy chi tiết bài viết và tên danh mục
+        $postRaw = $this->post->getById($id);
+        $categoryName = null;
+        if ($postRaw && isset($postRaw['category_id'])) {
+            $categoryModel = new \Lecon\Mvcoop\Models\Category_Post();
+            $category = $categoryModel->getById($postRaw['category_id']);
+            $categoryName = $category['name'] ?? null;
+        }
+        $post = [
+            'p_title' => $postRaw['title'] ?? '',
+            'p_content' => $postRaw['content'] ?? '',
+            'p_image' => $postRaw['image'] ?? '',
+            'c_name' => $categoryName,
+            'p_excerpt' => mb_substr(strip_tags($postRaw['content'] ?? ''), 0, 150) . '...',
+            'created_at' => $postRaw['created_at'] ?? '',
+        ];
+
+        // Lấy 5 bài viết trending/mới nhất và map lại key cho post-entry1
+        $latestPostsRaw = $this->post->getLatestPosts(4);
+        $poststitileTradding = array_map(function($item) {
+            return [
+                'p_id' => $item['id'],
+                'p_title' => $item['title'],
+                'p_image' => $item['image'],
+                'c_name' => $item['category_name'] ?? '',
+                'p_excerpt' => mb_substr(strip_tags($item['content'] ?? ''), 0, 100) . '...',
+            ];
+        }, $latestPostsRaw);
+
+        return $this->renderViewClient('post-show',[
+            'logo' => $logo,
+            'slide_1' => $slide_1,
+            'footer' => $footer,
+            'hotline' => $hotline,
+            'title_logo' => $title_logo,
+            'post' => $post,
+            'categories' => $categories,
+            'poststitileTradding' => $poststitileTradding,
+        ]);
+    }
+
+    public function search_book()
+    {
+        $webSetting = new WebSetting();
+        $logo = $webSetting->getByName('logo')['value'] ?? '/assets/client/assets/img/logo.png';
+        $slide_1 = $webSetting->getByName('slide_1')['value'] ?? '/assets/client/assets/img/slide1.jpg';
+        $footer = $webSetting->getByName('footer')['value'] ?? '© 2025 ZenBlog. All rights reserved.';
+        $hotline = $webSetting->getByName('hotline')['value'] ?? '0901234567';
+        $title_logo =  $webSetting->getByName('title_logo')['value'] ?? 'ZEN BLOG';
+        $categories = $this->category->getAll();
+
+        $books = [];
+        $keyword = $_GET['keyword'] ?? $_GET['q'] ?? $_GET['search'] ?? '';
+        if (!empty($keyword)) {
+            $books = $this->book->searchBooks($keyword);
+        }
+
+        return $this->renderViewClient('search_book', [
+            'books' => $books,
+            'categories' => $categories,
+            'logo' => $logo,
+            'slide_1' => $slide_1,
+            'footer' => $footer,
+            'hotline' => $hotline,
+            'title_logo' => $title_logo,
+            'search_keyword' => $keyword,
+            'categoryId' => null,
+        ]);
+    }
 }
